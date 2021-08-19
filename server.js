@@ -12,7 +12,7 @@ io.on("connection", socket => {
 // Username middleware
 io.use((socket, next) => {
     const username = socket.handshake.auth.username;
-    if (!username) {
+    if (!username || username === '') {
         return next(new Error("invalid username"));
     }
 
