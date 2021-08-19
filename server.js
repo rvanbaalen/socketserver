@@ -23,10 +23,8 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
     const users = [];
     for (let [id, socket] of io.of("/").sockets) {
-        users.push({
-            userID: id,
-            username: socket.username,
-        });
+        const {username} = socket;
+        users.push({id, username});
     }
     socket.emit("users", users);
 });
