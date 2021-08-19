@@ -20,4 +20,15 @@ io.use((socket, next) => {
     next();
 });
 
+io.on("connection", (socket) => {
+    const users = [];
+    for (let [id, socket] of io.of("/").sockets) {
+        users.push({
+            userID: id,
+            username: socket.username,
+        });
+    }
+    socket.emit("users", users);
+});
+
 io.listen(process.env.PORT || 3000);
