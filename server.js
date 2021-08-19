@@ -9,4 +9,4 @@ io.on("connection", socket => {
     console.log('Received a new connection');
 });
 
-io.listen(3000);
+io.listen(process.env.PORT || 3000);
