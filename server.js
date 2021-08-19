@@ -29,4 +29,10 @@ io.on("connection", (socket) => {
     socket.emit("users", users);
 });
 
+io.on("connection", (socket) => {
+    // notify existing users
+    const {id, username} = socket;
+    socket.broadcast.emit("user connected", {id, username});
+});
+
 io.listen(process.env.PORT || 3000);
