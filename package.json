@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/rvanbaalen/socketserver#readme",
   "engines": {
-    "node": "12.17.x"
+    "node": "14.17.*"
   },
   "dependencies": {
     "express": "^4.17.1",
