@@ -84,24 +84,4 @@ export function registerPlayerHandlers({io, socket, sessionStore}) {
 export const connectPlayerToLobby = async function ({io, socket, lobbyCode, player}) {
     // Notify everyone except current user
     socket.broadcast.to(lobbyCode).emit("player:connected", player);
-    //await updatePlayerStats({lobbyCode, io, player});
-}
-
-export const updatePlayerStats = async function ({lobbyCode, io, player}) {
-    if (typeof lobbyCode !== 'string') {
-        new Error('No valid lobby code supplied in updatePlayerStats. Received: ' + lobbyCode);
-    }
-
-    await db.read();
-    const lobby = db.data.lobbies[lobbyCode];
-
-    // Notify everyone about new player numbers
-    const totalPlayers = lobby.players.length;
-    const data = {
-        players: lobby.players.map(p => p.username),
-        totalPlayers,
-        player
-    };
-
-    io.in(lobby.code).emit('player:stats', data);
 }
