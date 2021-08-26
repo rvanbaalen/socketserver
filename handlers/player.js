@@ -1,5 +1,4 @@
 import db from "../database.js";
-await db.read();
 
 export async function disconnectPlayerFromLobby({player}) {
     if (!db.data.lobbies[player.lobbyCode]) {
