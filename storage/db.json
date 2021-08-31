@@ -1,27 +1,4 @@
 {
-  "lobbies": {
-    "COOL": {
-      "createdAt": "2021-08-30T14:38:32.680Z",
-      "updatedAt": "2021-08-30T14:38:32.680Z",
-      "code": "COOL",
-      "state": "levelSelect",
-      "players": [
-        {
-          "userId": "590317b9e63307a1",
-          "username": "Lefty",
-          "connected": true,
-          "lobbyCode": "COOL"
-        },
-        {
-          "userId": "f01bbbdda4339918",
-          "username": "Robin",
-          "connected": true,
-          "lobbyCode": "COOL"
-        }
-      ],
-      "level": "level4",
-      "data": {}
-    }
-  },
+  "lobbies": {},
   "players": []
 }
