@@ -14,4 +14,12 @@ export class SessionManager {
     findAllSessions() {
         return [...this.sessions.values()];
     }
+
+    setValue(id, key, value) {
+        const session = this.sessions.get(id);
+        session[key] = value;
+        this.saveSession(id, session);
+
+        return this;
+    }
 }

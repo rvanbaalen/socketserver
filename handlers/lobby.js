@@ -1,5 +1,5 @@
 import db from "../database.js";
-import {addPlayerToLobby, connectPlayerToLobby, disconnectPlayerFromLobby} from "./player.js";
+import {Player} from "./player.js";
 
 async function findOrCreateLobby({lobbyCode, player}) {
     let lobby = db.data.lobbies[lobbyCode];
@@ -9,7 +9,7 @@ async function findOrCreateLobby({lobbyCode, player}) {
     }
 
     // Save the player, this will also trigger a database write action
-    return await addPlayerToLobby({lobbyCode, player});
+    return await Player.addToLobby({lobbyCode, player});
 }
 
 function createLobby({lobbyCode}) {
@@ -32,28 +32,17 @@ export async function updateLobby({key, value, io, socket}) {
     db.data.lobbies[lobbyCode] = lobby;
     await db.write();
 
-    console.log('Lobby level:', lobby.level);
     io.to(lobbyCode).emit('lobby:updated', {lobby});
 }
 
 async function connectToLobby({lobbyCode, player, io, socket, sessionStore}) {
-    // register the lobby code to the socket
-    socket.lobbyCode = lobbyCode;
-    // Store the lobbyCode in the session
-    sessionStore.saveSession(socket.sessionId, {
-        userId: socket.userId,
-        username: socket.username,
-        connected: true,
-        lobbyCode,
-    });
-
     // Retrieve the full lobby data
     const lobby = await findOrCreateLobby({lobbyCode, player});
 
     // Join room
     socket.join(lobby.code);
 
-    await connectPlayerToLobby({io, socket, lobbyCode, player, sessionStore});
+    socket.broadcast.to(lobbyCode).emit("player:connected", {player});
 
     // Dispatch updated lobby information to the current user
     // io.to(socket.id).emit('lobby:updated', {lobby});
@@ -64,37 +53,35 @@ async function connectToLobby({lobbyCode, player, io, socket, sessionStore}) {
     return lobby;
 }
 
-export function registerLobbyHandlers({io, socket, sessionStore}) {
-    const {id, username} = socket;
-    const player = {id, username};
+function addLobbyToPlayerSession({lobbyCode, socket, sessionStore}) {
+    sessionStore.setValue(socket.sessionId, 'lobbyCode', lobbyCode);
+    return sessionStore.findSession(socket.sessionId);
+}
 
-    const createLobby = async function ({lobbyCode}) {
-        console.log('create', player, lobbyCode);
+export function registerLobbyHandlers({io, socket, sessionStore}) {
+
+    const joinOrCreateLobby = async ({event, lobbyCode}) => {
+        const player = addLobbyToPlayerSession({lobbyCode, sessionStore, socket});
         const lobby = await connectToLobby({lobbyCode, player, io, socket, sessionStore});
         // Send to current user
-        io.to(socket.id).emit('lobby:created', {lobby});
+        io.to(socket.id).emit(`lobby:${event}`, {lobby});
         if (lobby.level) {
-            console.log('Level already defined in lobby:', lobby.level);
             io.to(socket.id).emit('level:selected', {selectedLevel: lobby.level});
         }
+    }
+
+    const createLobby = async function ({lobbyCode}) {
+        await joinOrCreateLobby({event: 'created', lobbyCode})
     }
 
     const joinLobby = async function ({lobbyCode}) {
-        console.log('join', player, lobbyCode);
-        const lobby = await connectToLobby({lobbyCode, player, io, socket, sessionStore});
-        // Send to current user
-        io.to(socket.id).emit('lobby:joined', {lobby});
-        if (lobby.level) {
-            console.log('Level already defined in lobby:', lobby.level);
-            io.to(socket.id).emit('level:selected', {selectedLevel: lobby.level});
-        }
+        await joinOrCreateLobby({event: 'joined', lobbyCode});
     }
 
     const leaveLobby = async function ({lobbyCode}) {
-        await disconnectPlayerFromLobby({lobbyCode, player});
+        const player = addLobbyToPlayerSession({lobbyCode, sessionStore, socket});
+        await Player.disconnectFromLobby({player});
         socket.leave(lobbyCode);
-        // Send to current user
-        io.to(socket.id).emit('lobby:left', {lobby});
         // Send to everyone except current user
         socket.broadcast.to(lobbyCode).emit("player:left", {player});
     }
