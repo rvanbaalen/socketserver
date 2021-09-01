@@ -62,9 +62,9 @@ export class Player {
                 sessionStore.setValue(socket.sessionId, 'connected', false);
             }
 
-            if (socket.lobbyCode) {
+            if (player.lobbyCode) {
                 // Only broadcast disconnect if player was actually connected to a lobby
-                socket.broadcast.to(socket.lobbyCode).emit('player:disconnected', {player});
+                socket.broadcast.to(player.lobbyCode).emit('player:disconnected', {player});
             }
         }
 

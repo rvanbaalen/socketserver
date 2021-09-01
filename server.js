@@ -48,10 +48,11 @@ class SocketServer {
         const version = process.env.npm_package_version;
         socket.emit('version', {version});
 
+        const player = Player.getFromSession({socket, sessionStore});
         // Game business
         socket.on('game:start', () => {
             //  Pass it on to the clients in the lobby
-            io.to(socket.lobbyCode).emit('game:start');
+            io.to(player.lobbyCode).emit('game:start');
         });
     }
 

@@ -65,9 +65,9 @@ export function registerLobbyHandlers({io, socket, sessionStore}) {
         const lobby = await connectToLobby({lobbyCode, player, io, socket, sessionStore});
         // Send to current user
         io.to(socket.id).emit(`lobby:${event}`, {lobby});
-        if (lobby.level) {
-            io.to(socket.id).emit('level:selected', {selectedLevel: lobby.level});
-        }
+        // if (lobby.level) {
+        //     io.to(socket.id).emit('level:selected', {selectedLevel: lobby.level});
+        // }
     }
 
     const createLobby = async function ({lobbyCode}) {
