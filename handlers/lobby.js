@@ -35,7 +35,7 @@ export async function updateLobby({key, value, io, socket}) {
     io.to(lobbyCode).emit('lobby:updated', {lobby});
 }
 
-async function connectToLobby({lobbyCode, player, io, socket, sessionStore}) {
+async function connectToLobby({lobbyCode, player, socket}) {
     // Retrieve the full lobby data
     const lobby = await findOrCreateLobby({lobbyCode, player});
 

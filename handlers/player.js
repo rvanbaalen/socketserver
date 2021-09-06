@@ -2,7 +2,9 @@ import db from "../database.js";
 
 export class Player {
     static async disconnectFromLobby({player}) {
-        let players = db.data.lobbies[player.lobbyCode].players;
+        let players = db.data.lobbies[player.lobbyCode]?.players;
+        if (!players) return;
+
         players = Player.removeFromCollection(players, player);
 
         if (players.length === 0) {

@@ -1,10 +1,20 @@
 import {Player} from "./player.js";
 
+let registeredColumns = {};
 export function registerGameHandlers({socket, sessionStore}) {
-    const completeGridColumn = async function ({columnLetter}) {
+    const completeGridColumn = async function ({columnLetter, highScore}) {
         const player = Player.getFromSession({socket, sessionStore});
-        // Send to everyone including current user
-        socket.broadcast.to(player.lobbyCode).emit('grid:column-completed', {columnLetter, player, first: true});
+        if (!registeredColumns[columnLetter]) {
+            registeredColumns[columnLetter] = {
+                high: {},
+                low: {}
+            };
+        }
+
+        const key = highScore ? 'high' : 'low';
+        registeredColumns[columnLetter][key][player.userId] = player.username;
+
+        socket.broadcast.emit('grid:column-completed', {columnLetter, player, highScore, registeredColumns});
     }
 
     socket.on('grid:column-complete', completeGridColumn);
