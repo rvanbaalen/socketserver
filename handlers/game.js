@@ -1,21 +1,13 @@
-import {Player} from "./player.js";
-
-let registeredColumns = {};
-export function registerGameHandlers({socket, sessionStore}) {
-    const completeGridColumn = async function ({columnLetter, highScore}) {
-        const player = Player.getFromSession({socket, sessionStore});
-        if (!registeredColumns[columnLetter]) {
-            registeredColumns[columnLetter] = {
-                high: {},
-                low: {}
-            };
-        }
-
-        const key = highScore ? 'high' : 'low';
-        registeredColumns[columnLetter][key][player.userId] = player.username;
-
-        socket.broadcast.emit('grid:column-completed', {columnLetter, player, highScore, registeredColumns});
+export function registerGameHandlers({socket}) {
+    const completeGridColumn = async function ({letter}) {
+        console.log('complete column', letter);
+        socket.broadcast.emit('grid:column-completed', {letter});
+    }
+    const clearGridColumn = async function ({letter}) {
+        console.log('clear column', letter);
+        socket.broadcast.emit('grid:column-cleared', {letter});
     }
 
     socket.on('grid:column-complete', completeGridColumn);
+    socket.on('grid:column-clear', clearGridColumn);
 }
