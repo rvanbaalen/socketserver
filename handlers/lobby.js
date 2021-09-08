@@ -4,7 +4,6 @@ import {Player} from "./player.js";
 async function findOrCreateLobby({lobbyCode, player}) {
     let lobby = db.data.lobbies[lobbyCode];
     if (!lobby) {
-        console.log('Create new lobby for player', player, lobbyCode);
         lobby = db.data.lobbies[lobbyCode] = createLobby({lobbyCode});
     }
 

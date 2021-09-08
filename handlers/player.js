@@ -8,10 +8,8 @@ export class Player {
         players = Player.removeFromCollection(players, player);
 
         if (players.length === 0) {
-            console.log('destroy lobby', player.lobbyCode)
             delete db.data.lobbies[player.lobbyCode];
         } else {
-            console.log('set new players', player.lobbyCode)
             db.data.lobbies[player.lobbyCode].players = players;
         }
 
