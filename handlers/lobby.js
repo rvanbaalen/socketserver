@@ -4,7 +4,7 @@ import {Player} from "./player.js";
 async function findOrCreateLobby({lobbyCode, player}) {
     let lobby = db.data.lobbies[lobbyCode];
     if (!lobby) {
-        lobby = db.data.lobbies[lobbyCode] = createLobby({lobbyCode});
+        db.data.lobbies[lobbyCode] = createLobby({lobbyCode});
     }
 
     // Save the player, this will also trigger a database write action
